@@ -1,0 +1,79 @@
+# Utilisé par GitHub lorsque le fichier gitignore est mis en correspondance avec un fichier de dépôt.
+# Voir https://docs.github.com/en/free-pro-team@latest/github/using-git/ignoring-files
+# 
+# Éditez à votre convenance avant de l'utiliser.
+# 
+# Informations sur ce modèle gitignore : https://github.com/dotnet/core/blob/main/.gitignore
+
+## Ignorer les fichiers générés par le build
+[Bb]in/
+[Oo]bj/
+
+# Ignorer les fichiers de configuration et de publication
+.publish/
+
+# Ignorer les packages NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Ignorer les dossiers de restauration de NPM
+node_modules/
+
+# Ignorer les fichiers de configuration des utilisateurs
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignorer les dossiers de logs et les fichiers de logs
+logs/
+*.log
+
+# Ignorer les fichiers de déploiement
+app.publish/
+
+# Ignorer les fichiers temporaires
+*.swp
+*~
+
+# Ignorer les fichiers spécifiques à JetBrains Rider
+.idea/
+
+# Ignorer les fichiers spécifiques à Visual Studio
+.vscode/
+*.code-workspace
+.vs/
+
+# Ignorer les fichiers de configuration de l'IDE
+*.vcxproj.user
+*.vscode/
+.vscode/
+
+# Ignorer les fichiers de configuration spécifiques à Mac
+*.DS_Store
+
+# Ignorer les fichiers de configuration de l'outil dotnet user-secrets
+secrets.json
+
+# Ignorer les dossiers de test
+TestResults/
+
+# Ignorer les fichiers de sauvegarde
+*.bak
+
+# Ignorer les fichiers générés par Visual Studio lors de l'exécution
+*.userprefs
+
+# Ignorer les fichiers de configuration de l'outil global dotnet
+.dotnet_tool/
+
+# Ignorer les fichiers spécifiques aux serveurs de CI
+.env
+
+# Ignorer les fichiers de configuration de logs et de traces
+*.log
+trace*.txt
