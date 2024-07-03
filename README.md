@@ -19,5 +19,7 @@
     Microsoft.AspNetCore.SignalR
 
 # Migration : dotnet tool install --global dotnet-ef --version 8.*
-    dotnet ef migrations add init  => generate code to create database
+    dotnet ef migrations add init  => generate code to create database <= dotnet ef migrations remove
     dotnet ef database update       => Create database
+    dotnet ef migrations remove => Annule dotnet ef migrations add init lorsqu'on a pas encore fait update
+        => Sinon `dotnet ef database update 0` PUIS => `dotnet ef migrations remove`

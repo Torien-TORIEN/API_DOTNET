@@ -11,8 +11,8 @@ namespace api.Models
         public string message { get; set; }=string.Empty;
         public DateTime sendAt { get; set;}= DateTime.Now;
 
-        /* public int? fromUserId { get; set; }//Navigation
-        public User? fromUser { get; set; } */
+        public int? fromUserId { get; set; }//Navigation
+        public User? fromUser { get; set; }
 
          public int? toUserId { get; set; }//Navigation
         public User? toUser { get; set;}

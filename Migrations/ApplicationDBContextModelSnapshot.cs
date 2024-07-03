@@ -30,6 +30,9 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("fromUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -41,6 +44,8 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("fromUserId");
 
                     b.HasIndex("toUserId");
 
@@ -59,6 +64,10 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -70,9 +79,15 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Message", b =>
                 {
+                    b.HasOne("api.Models.User", "fromUser")
+                        .WithMany()
+                        .HasForeignKey("fromUserId");
+
                     b.HasOne("api.Models.User", "toUser")
                         .WithMany()
                         .HasForeignKey("toUserId");
+
+                    b.Navigation("fromUser");
 
                     b.Navigation("toUser");
                 });
