@@ -23,3 +23,10 @@
     dotnet ef database update       => Create database
     dotnet ef migrations remove => Annule dotnet ef migrations add init lorsqu'on a pas encore fait update
         => Sinon `dotnet ef database update 0` PUIS => `dotnet ef migrations remove`
+    
+    Après la modification des models :
+    ` dotnet ef migrations add AddNewEntity ` et `dotnet ef database update` 
+
+# Parfois, les fichiers intermédiaires du compilateur peuvent causer des problèmes. Essayez de nettoyer et de reconstruire le projet :
+    dotnet clean
+    dotnet build
