@@ -1,0 +1,69 @@
+.example-container {
+    height: 100%;
+    margin: 10px;
+    background: #eee;
+    margin: 0px !important;
+  }
+
+  .drawer {
+    &-container {
+      height: 90%;
+  
+      &-menu {
+        width: 280px;
+      }
+    }
+  }
+  
+  .menu {
+    &-title {
+      display: flex;
+      font-size: 20px;
+      font-weight: bold;
+  
+      &-icon {
+        margin-right: 10px;
+        margin-left: 5px;
+      }
+    }
+  
+    &-item {
+      cursor: pointer;
+      margin-left: 20px;
+      border-radius: 5px;
+      width: 250px;
+      text-align: start;
+      padding: 10px;
+
+      border: #555;
+      display: flex;
+      //align-items: center;
+      //justify-content: center;
+  
+      &:hover {
+        background-color: #757575;
+      }
+    }
+  }
+
+
+
+  .btn{
+    margin: 10px;
+    background-color: #cfd87d;
+
+  }
+  
+  .btn:hover{
+    background-color: #757575;
+    color: white;
+  }
+
+  .toolbar{
+    display: flex;
+    justify-content: space-between; /* Centers items horizontally */
+    align-items: center; /* Centers items vertically */
+    //width: 100%;
+    background-color: #b8b8b8;
+    
+  }

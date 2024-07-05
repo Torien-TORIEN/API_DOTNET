@@ -1,0 +1,45 @@
+<div class="message-container">
+    <div class="users-list">
+      <h2>Friends</h2>
+      <ul>
+        @for (user of users; track user) {
+          @if(user.id !== Me.id){
+            <li (click)="selectUser(user)" [class.selected]="user === selectedUser">
+              {{ user.username }}
+            </li>
+          }
+        }
+      </ul>
+    </div>
+  
+    <div class="messages">
+      <h2> <mat-icon class="icon">supervised_user_circle</mat-icon> {{ selectedUser?.username }}</h2>
+      @if (selectedUser) {
+        <div>
+          @for (message of getConversationWithUser(selectedUser); track message) {
+            <div class="message" [class]="message.fromUserId === Me.id?'sent':'received'">
+              <div class="message-details">
+                @if(message.fromUserId==Me.id){
+                  <span class="message-author">You</span>
+                }@else {
+                  <span class="message-author">{{ selectedUser.username }}</span>
+                }
+                
+                <span class="message-date">{{ formatDate(message.sendAt) }}</span>
+              </div>
+              <div class="message-text">{{ message.message }}</div>
+            </div>
+          }
+        </div>
+        <div class="message-input">
+          <input [(ngModel)]="newMessage" placeholder="Type a message..." />
+          <button (click)="sendMessage()">Send</button>
+        </div>
+      }@else {
+        <div>
+          <p>Select a user to view the conversation.</p>
+        </div>
+      }
+    </div>
+</div>
+  

@@ -1,0 +1,46 @@
+<mat-toolbar>
+    <mat-toolbar-row class="toolbar">
+        <div class="toolbar-start">
+            <span>Chat App</span>
+        </div>
+      <div class="toolbar-end">
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+            <mat-icon>person_circle</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item>
+              <mat-icon>account_circle</mat-icon>
+              <span>{{Me.username}}</span>
+            </button>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Log out</span>
+            </button>
+          </mat-menu>
+      </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-drawer-container class="example-container drawer-container">
+    <mat-drawer mode="side" opened class="drawer-container-menu">
+
+        <mat-list-item matListItemTitle>
+            <span matLine class="menu-title">
+                <mat-icon class="menu-title-icon">menu</mat-icon>
+                Menus
+            </span>
+        </mat-list-item>
+        <ng-container>
+            @for(menu of menus; track menu) {
+                <mat-list-item matLine (click)="navigateToRoute(menu.route)" matListItemLine class="menu-item">
+                    {{menu.name }}
+                </mat-list-item>
+            }
+        </ng-container>
+
+        
+
+    </mat-drawer>
+    <mat-drawer-content class="drawer_content">
+        <router-outlet></router-outlet>
+    </mat-drawer-content>
+</mat-drawer-container>
