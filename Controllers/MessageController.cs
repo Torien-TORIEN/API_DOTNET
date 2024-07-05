@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Dtos;
+using api.Hubs;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
@@ -76,6 +78,12 @@ namespace api.Controllers
 
             _context.Messages.Add(newMessage);
             _context.SaveChanges();
+
+            //[SignalR]
+            // Envoie le nouveau message à tous les clients via SignalR
+            var hubContext = HttpContext.RequestServices.GetService<IHubContext<MessageHub>>();
+            hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", $"New message: {newMessage.message}");
+
             return CreatedAtAction(nameof(GetById), new { id = newMessage.Id }, newMessage);
         }
 
