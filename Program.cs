@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
         builder => builder
-            .WithOrigins("http://localhost:53737")
+            .WithOrigins("http://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -65,6 +65,7 @@ app.MapControllers();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<MessageHub>("/messageHub"); // Endpoint pour le hub SignalR
+    endpoints.MapHub<PostHub>("/postHub"); // Endpoint pour le hub SignalR
     endpoints.MapControllers();
 });
 

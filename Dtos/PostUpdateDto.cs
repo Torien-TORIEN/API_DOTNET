@@ -8,6 +8,6 @@ namespace api.Dtos
     public class PostUpdateDto
     {
         public string Comment { get; set; } = string.Empty;
-        public int Likes { get; set; }
+        public string Image { get; set; } = string.Empty;
     }
 }

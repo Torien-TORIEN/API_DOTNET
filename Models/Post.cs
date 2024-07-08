@@ -10,6 +10,10 @@ namespace api.Models
         public int Id { get; set; }
         public string comment { get; set; } = String.Empty;
         public int  likes { get; set; }
+        public int  dislikes { get; set; }
+
+        public string image { get; set; } = String.Empty;
+        
         public DateTime createdAt { get; set;}= DateTime.Now;
 
         public int? userId { get; set; }//Navigation
