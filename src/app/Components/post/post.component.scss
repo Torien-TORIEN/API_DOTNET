@@ -1,0 +1,45 @@
+.posts-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 0.5%;
+  }
+  .posts-list > div {
+    flex: 1 1 calc(33.333% - 20px); /* Ajustez la largeur selon vos besoins */
+    min-width: 300px; /* Largeur minimale pour s'assurer qu'il passe à la ligne si trop petit */
+  }
+  
+
+.header{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between; /* Centers items horizontally */
+    align-items: center; /* Centers items vertically */
+
+    &-filter{
+        margin-left: 20px;
+    }
+
+    &-form{
+        .form{
+            margin-right: 10px;
+            
+            &-content{
+                width: 400px;
+            }
+
+            &-image{
+                width: 300px;
+            }
+        }
+
+        &-button{
+            background-color: green;
+            margin-right: 10px;
+            margin-bottom: 15px;
+            height: 55px;
+            width: 60px !important;
+        }
+    }
+
+}

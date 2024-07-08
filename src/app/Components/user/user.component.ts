@@ -24,6 +24,7 @@ export class UserComponent implements AfterViewInit, OnInit {
 
   users!: User[];
   buttonLabel = "Save";
+  userEditId !: number;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -77,27 +78,50 @@ export class UserComponent implements AfterViewInit, OnInit {
       const {username, email, password} = this.form.value;
 
       // Add
-      this.userService.addUser({username, email, password})
-        .then(data => {
-          console.log("adding user: ", data);
-          this.form.reset();
-          this.getAllUsers();
-        })
-        .catch(error => {
-          console.log("Component user:", error);
-        });
+      if(this.userEditId && this.userEditId!==0){
+        //Edit
+        this.userService.updateUser(this.userEditId, {username, email, password})
+          .then( data =>{
+            this.form.reset();
+            this.userEditId=0;
+            this.getAllUsers();
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }else{
+        this.userService.addUser({username, email, password})
+          .then(data => {
+            this.form.reset();
+            this.getAllUsers();
+          })
+          .catch(error => {
+            console.log("Component user:", error);
+          });
+      }
     }
   }
 
   deleteUser(id: number) {
-    console.log("ID:", id);
     this.userService.deleteUser(id)
       .then(data => {
-        console.log("deleting user");
         this.getAllUsers();
       })
       .catch(error => {
         console.log("deleting user", error);
       });
+  }
+
+  selectUserToEdit(id :number){
+    this.userEditId=0;
+    const user = this.users.filter((user)=> (user.id==id))[0];
+    if(user){
+      this.userEditId=user.id;
+      this.form.patchValue({
+        username : user.username,
+        email : user.email,
+        password :user.password
+      })
+    }
   }
 }

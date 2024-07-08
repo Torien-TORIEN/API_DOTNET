@@ -1,0 +1,47 @@
+.example-card {
+    width: 400px;
+  }
+  
+  .example-header-image {
+    background-image: url('../../../assets/img/no-profile-image.png');
+    background-size: cover;
+  }
+
+  .image{
+    align-items: center;
+    margin-left: 50px;
+    max-width: 300px;
+    height: 200px;
+  }
+
+  .icon{
+    margin-left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+
+    &-like{
+        color: blue;
+    }
+
+    &-dislike{
+        color :red;
+    }
+  }
+
+  .actions{
+    margin-right: 10px;
+    margin-left: 200px;
+
+    .icon-edit{
+        color : green;
+    }
+    
+    .icon-edit:hover{
+        color : blue;
+        box-shadow: inset;
+    }
+
+    .icon-delete:hover{
+        color : red;
+    }
+  }

@@ -1,1 +1,35 @@
-<p>post works!</p>
+<div class="header">
+    <div class="header-filter">
+        <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input matInput  placeholder="Ex. Max" #input (input)="applyFilter($event)">
+        </mat-form-field>
+    </div>
+    <form class="header-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field class="form form-content">
+            <mat-label>Content</mat-label>
+            <textarea matInput placeholder="Ex. It makes me feel..." formControlName="comment"></textarea>
+            @if (form.get('comment')?.hasError("required")) {
+                <mat-error>Conent is not valid</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field class="form form-image">
+            <mat-label>Image URI</mat-label>
+            <input matInput  placeholder="Ex. https://image.png" formControlName="image">
+        </mat-form-field>
+
+        <button type="submit" mat-button class="header-form-button" [disabled]="!form.valid"> {{buttonLabel}} </button>
+    </form>
+</div>
+
+<hr>
+<div class="posts-list">
+    @for( post of posts; track post){
+        <div>
+            <app-post-detail [userLogged]="Me" [post]="post" (postToEdit)="selectPostToEdit($event)"></app-post-detail>
+        </div>
+    }
+</div>
+
+

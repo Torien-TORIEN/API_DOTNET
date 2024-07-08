@@ -1,13 +1,13 @@
 import { User } from "./user.model";
 
 export interface Message {
-    id: Number;
+    id: number;
     message: string;
     email : string;
     sentAt : Date;
-    fromUserId: Number;
+    fromUserId: number;
     fromUser? : User;
-    toUserId :Number
+    toUserId :number
     toUser ?:User
   }
   

@@ -1,11 +1,13 @@
 import { User } from "./user.model";
 
 export interface Post {
-    id: Number;
+    id: number;
     comment: string;
-    likes : Number;
+    likes : number;
+    dislikes : number;
+    image: string;
     createdAt : Date;
-    userId: Number;
+    userId: number;
     owner? : User;
   }
   

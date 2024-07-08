@@ -1,0 +1,32 @@
+<mat-card class="example-card" appearance="outlined">
+    <mat-card-header>
+      <div mat-card-avatar class="example-header-image"></div>
+        <mat-card-title>{{post.owner?.username}}</mat-card-title>
+        <mat-card-subtitle>{{formatDate(post.createdAt)}}</mat-card-subtitle>
+    </mat-card-header>
+    @if(post.image){
+        <img class="image" mat-card-image [src]="post.image" alt="Photo of a Shiba Inu" width="300px">
+    }@else{
+        <img class="image" mat-card-image src="../../../assets/img/noimg.png" alt="Photo of a Shiba Inu" width="300px">
+    }
+    
+    <mat-card-content>
+      <p>
+        {{post.comment}}
+      </p>
+    </mat-card-content>
+    
+
+    <mat-card-actions>
+        <mat-icon class="icon icon-like" (click)="onlike()">thumb_up</mat-icon> <p>{{post.likes}}</p>
+        <mat-icon class="icon icon-dislike" (click)="onDislike()">thumb_down</mat-icon> <p>{{post.dislikes}}</p>
+
+        @if(userLogged.id==post.userId){
+            <p class="actions">
+                <mat-icon class="icon icon-edit" (click)="onEdit()">edit</mat-icon>
+                <mat-icon class="icon icon-delete" (click)="onDelete(post.id)">delete</mat-icon>
+            </p>
+        }
+    </mat-card-actions>
+    
+</mat-card>
