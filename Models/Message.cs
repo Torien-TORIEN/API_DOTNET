@@ -11,10 +11,15 @@ namespace api.Models
         public string message { get; set; }=string.Empty;
         public DateTime sendAt { get; set;}= DateTime.Now;
 
+        public Boolean isForGroup{ get; set;}
+
         public int? fromUserId { get; set; }//Navigation
         public User? fromUser { get; set; }
 
-         public int? toUserId { get; set; }//Navigation
+        public int? toUserId { get; set; }//Navigation
         public User? toUser { get; set;}
+
+        public int? toGroupId { get; set; }//Navigation
+        public Group? group { get; set;}
     }
 }

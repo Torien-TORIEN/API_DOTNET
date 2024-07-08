@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -11,9 +12,11 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240708131700_AddUserGroupManyToMany")]
+    partial class AddUserGroupManyToMany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,16 +51,11 @@ namespace api.Migrations
                     b.Property<DateTime>("createdAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("creatorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
+                    b.Property<string>("nom")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("creatorId");
 
                     b.ToTable("Groups");
                 });
@@ -73,12 +71,6 @@ namespace api.Migrations
                     b.Property<int?>("fromUserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("groupId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isForGroup")
-                        .HasColumnType("bit");
-
                     b.Property<string>("message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -86,17 +78,12 @@ namespace api.Migrations
                     b.Property<DateTime>("sendAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("toGroupId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("toUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("fromUserId");
-
-                    b.HasIndex("groupId");
 
                     b.HasIndex("toUserId");
 
@@ -178,33 +165,17 @@ namespace api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.Group", b =>
-                {
-                    b.HasOne("api.Models.User", "creator")
-                        .WithMany()
-                        .HasForeignKey("creatorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("creator");
-                });
-
             modelBuilder.Entity("api.Models.Message", b =>
                 {
                     b.HasOne("api.Models.User", "fromUser")
                         .WithMany()
                         .HasForeignKey("fromUserId");
 
-                    b.HasOne("api.Models.Group", "group")
-                        .WithMany()
-                        .HasForeignKey("groupId");
-
                     b.HasOne("api.Models.User", "toUser")
                         .WithMany()
                         .HasForeignKey("toUserId");
 
                     b.Navigation("fromUser");
-
-                    b.Navigation("group");
 
                     b.Navigation("toUser");
                 });
