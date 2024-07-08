@@ -1,16 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
 import { MessageService } from '../../Services/message.service';
 import { UserService } from '../../Services/user.service';
 import { LoginService } from '../../Services/login.service';
 import { User } from '../../Models/user.model';
 import { SignalRService } from '../../Services/signalR.service';
+import { GroupService } from '../../Services/group.service';
+import { Group } from '../../Models/group.model';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [FormsModule,MatIconModule],
+  imports: [FormsModule,MatIconModule,MatDialogModule,MatFormFieldModule,MatInputModule, MatButtonModule],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
@@ -23,12 +30,18 @@ export class MessageComponent implements OnInit {
   selectedUser: any;
   newMessage: string = '';
   messages : any;
+  groups !: Group[];
+
+  groupName !: string;
+  @ViewChild('dialogGroup', { static: false }) eventDialog!: TemplateRef<any>;
 
   constructor(
     private messageService: MessageService,
     private userService : UserService,
     private loginService : LoginService,
-    private signalRService: SignalRService
+    private signalRService: SignalRService,
+    private groupService : GroupService,
+    private dialog: MatDialog,
   ){
     this.getUserConnected();
   }
@@ -37,6 +50,7 @@ export class MessageComponent implements OnInit {
     
     this.loadMessages();
     this.getAllUsers();
+    this.getAllGroups();
 
     //SignalR
     this.signalRService.startConnection();
@@ -138,5 +152,40 @@ export class MessageComponent implements OnInit {
     const minutes = date.getMinutes().toString().padStart(2, '0');
   
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+
+  getAllGroups(){
+    this.groupService.getAllGroups()
+    .then(groups=>{
+      this.groups=groups;
+    })
+    .catch(err=>{
+      console.log(err.message);
+    })
+  }
+
+  createGroup(){
+    if(this.groupName && this.groupName.length >= 2){
+      console.log(" creating group");
+      
+      const group ={
+        name : this.groupName,
+        creatorId : this.Me.id,
+        membersIds : [ this.Me.id]
+      }
+      console.log(" group : ", group);
+      
+      this.groupService.addGroup(group).
+      then(data=>{
+        this.getAllGroups();
+      })
+      .catch(err=>{
+        console.log(err.message);
+      })
+    }
+  }
+
+  openDialogWithRef(ref: TemplateRef<any>) {
+    const dialogRef = this.dialog.open(ref);
   }
 }

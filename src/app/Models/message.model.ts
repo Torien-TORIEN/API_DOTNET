@@ -1,3 +1,4 @@
+import { Group } from "./group.model";
 import { User } from "./user.model";
 
 export interface Message {
@@ -7,7 +8,11 @@ export interface Message {
     sentAt : Date;
     fromUserId: number;
     fromUser? : User;
-    toUserId :number
-    toUser ?:User
-  }
+    toUserId :number;
+    toUser? :User;
+    isForGroup : boolean;
+    toGroupId? : number;
+    group? :Group;
+
+}
   

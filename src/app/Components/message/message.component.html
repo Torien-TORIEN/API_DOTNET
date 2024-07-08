@@ -10,6 +10,16 @@
           }
         }
       </ul>
+
+      <h2>Groups <mat-icon (click)="openDialogWithRef(dialogGroup)" color="green">add</mat-icon></h2> 
+      <ul>
+        @for (group of groups; track group) {
+            <li (click)="selectUser(group)" [class.selected]="group === selectedUser">
+              {{ group.name }}
+            </li>
+          
+        }
+      </ul>
     </div>
   
     <div class="messages">
@@ -43,3 +53,20 @@
     </div>
 </div>
   
+
+<!-- Group Dialog Template -->
+<ng-template #dialogGroup>
+  <mat-dialog-content class="dialog-content" align="center">
+
+    <mat-form-field class="dialog-form-field label">
+      <mat-label>group name</mat-label>
+      <input matInput [(ngModel)]="groupName">
+    </mat-form-field>
+
+    <mat-dialog-actions align="end" class="dialog-label">
+      <button mat-flat-button matDialogClose color="primary" (click)="createGroup()">OK</button>
+      <button mat-flat-button matDialogClose >Cancel</button>
+    </mat-dialog-actions>
+
+  </mat-dialog-content>
+</ng-template>

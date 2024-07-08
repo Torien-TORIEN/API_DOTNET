@@ -32,7 +32,7 @@ export class UserService {
           resolve(data);
         },
         error: err=>{
-          reject("Error while adding a message :"+ err.message)
+          reject("Error while adding an user :"+ err.message)
         }
       })
     })
