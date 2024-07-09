@@ -14,6 +14,6 @@ namespace api.Models
         public string  password { get; set; }= String.Empty; 
 
         // Many-to-Many relationship
-        public ICollection<Group> Groups { get; set; } = new List<Group>();
+        //public ICollection<Group> Groups { get; set; } = new List<Group>();
     }
 }

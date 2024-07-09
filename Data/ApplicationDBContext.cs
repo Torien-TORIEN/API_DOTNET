@@ -17,21 +17,26 @@ namespace api.Data
             base.OnModelCreating(modelBuilder);
 
             // Configure Many-to-Many relationship between User and Group
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Groups)
-                .WithMany(g => g.Members)
+            modelBuilder.Entity<Group>()
+                .HasMany(g => g.Members)
+                .WithMany()
                 .UsingEntity<Dictionary<string, object>>(
                     "UserGroup",
-                    j => j.HasOne<Group>().WithMany().HasForeignKey("GroupId"),
-                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId"),
+                    j => j.HasOne<Group>().WithMany().HasForeignKey("GroupId")
                 );
 
-            // Configure One-to-Many relationship for Group.creator
+            // Configure One-to-Many relationship for Group.Creator
             modelBuilder.Entity<Group>()
                 .HasOne(g => g.creator)
                 .WithMany()
                 .HasForeignKey(g => g.creatorId)
                 .OnDelete(DeleteBehavior.Restrict); // Optional: Define delete behavior
+            
+            // Make the Name field unique
+            modelBuilder.Entity<Group>()
+                .HasIndex(g => g.name)
+                .IsUnique();
         }
     }
 }

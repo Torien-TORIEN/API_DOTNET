@@ -49,18 +49,13 @@ namespace api.Controllers
         [HttpGet("user/{userId}/groups")]
         public IActionResult GetGroupsByUser(int userId)
         {
-            var user = _context.Users
-                .Include(u => u.Groups) // Inclure les groupes associés
-                .FirstOrDefault(u => u.Id == userId);
+            var userGroups = _context.Groups
+                .FromSqlRaw("SELECT g.* FROM Groups g INNER JOIN UserGroup ug ON g.Id = ug.GroupId WHERE ug.UserId = {0}", userId)
+                .ToList();
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var groups = user.Groups;
-            return Ok(groups);
+            return Ok(userGroups);
         }
+
 
         // Récupérer tous les utilisateurs d'un groupe
         [HttpGet("{groupId}/users")]
@@ -95,6 +90,7 @@ namespace api.Controllers
             var newGroup = new Group
             {
                 name = newGroupDto.Name,
+                creatorId = newGroupDto.CreatorId,
                 Members = users
             };
 
@@ -129,16 +125,21 @@ namespace api.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var group = _context.Groups.Find(id);
+            var group = _context.Groups.Include(g => g.Members).FirstOrDefault(g => g.Id == id);
             if (group == null)
             {
                 return NotFound();
             }
 
+            // Supprimer les relations dans UserGroup
+            _context.Entry(group).Collection(g => g.Members).Load();
+            group.Members.Clear();
+            
             _context.Groups.Remove(group);
             _context.SaveChanges();
             return NoContent();
         }
+
 
         [HttpPost("{groupId}/users/{userId}")]
         public IActionResult AddUserToGroup(int groupId, int userId)
