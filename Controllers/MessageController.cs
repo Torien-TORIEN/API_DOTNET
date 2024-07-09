@@ -71,6 +71,8 @@ namespace api.Controllers
                 message = newMessageDto.Message,
                 fromUserId = newMessageDto.FromUserId,
                 toUserId = newMessageDto.ToUserId,
+                isForGroup = newMessageDto.IsForGroup,
+                toGroupId = newMessageDto.toGroupId,
                 sendAt = DateTime.Now,// Set sendAt to current time
                 fromUser=null,
                 toUser=null
@@ -121,6 +123,43 @@ namespace api.Controllers
                                     .Include(m => m.toUser)
                                     .ToList();
             return Ok(messages);
+        }
+
+        // Autres méthodes existantes du contrôleur
+        [HttpGet("user/{userId}")]
+        public IActionResult GetMessagesForUser(int userId)
+        {
+            // Récupérer les messages envoyés par l'utilisateur
+            var sentMessages = _context.Messages
+                .Where(m => m.fromUserId == userId)
+                //.Include(m => m.fromUser)
+                //.Include(m => m.toUser)
+                .ToList();
+
+            // Récupérer les messages destinés à l'utilisateur
+            var receivedMessages = _context.Messages
+                .Where(m => m.toUserId == userId)
+                //.Include(m => m.fromUser)
+                //.Include(m => m.toUser)
+                .ToList();
+
+            // Récupérer les messages liés aux groupes de l'utilisateur, mais pas ceux qu'il a envoyés
+            var groupMessages = _context.Messages
+                .FromSqlInterpolated($@"
+                    SELECT m.*
+                    FROM Messages m
+                    INNER JOIN Groups g ON m.toGroupId = g.Id
+                    INNER JOIN UserGroup ug ON g.Id = ug.GroupId
+                    WHERE ug.UserId = {userId} 
+                ")
+                //.Include(m => m.fromUser)
+                //.Include(m => m.group)
+                .ToList();
+
+            // Fusionner les listes de messages distincts
+            var userMessages = sentMessages.Union(receivedMessages).Union(groupMessages).ToList();
+
+            return Ok(userMessages);
         }
     }
 }
