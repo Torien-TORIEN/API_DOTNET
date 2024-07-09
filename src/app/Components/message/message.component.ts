@@ -2,6 +2,12 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {MatMenuModule} from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import {MatSelectModule} from '@angular/material/select';
+
 
 import { MessageService } from '../../Services/message.service';
 import { UserService } from '../../Services/user.service';
@@ -10,29 +16,28 @@ import { User } from '../../Models/user.model';
 import { SignalRService } from '../../Services/signalR.service';
 import { GroupService } from '../../Services/group.service';
 import { Group } from '../../Models/group.model';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [FormsModule,MatIconModule,MatDialogModule,MatFormFieldModule,MatInputModule, MatButtonModule],
+  imports: [FormsModule,MatIconModule,MatDialogModule,MatFormFieldModule,MatInputModule, MatButtonModule,MatMenuModule, MatSelectModule],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
 export class MessageComponent implements OnInit {
 
   Me !:User;
-  messagesSent: any;
-  messagesReceived: any;
+  messagesConversation:any;
   users: any;
-  selectedUser: any;
+  selectedUserOrGroup: any;
+  isUserSelected =true;
   newMessage: string = '';
   messages : any;
   groups !: Group[];
 
+
   groupName !: string;
+  userToAddInGroupId!:number
   @ViewChild('dialogGroup', { static: false }) eventDialog!: TemplateRef<any>;
 
   constructor(
@@ -50,7 +55,7 @@ export class MessageComponent implements OnInit {
     
     this.loadMessages();
     this.getAllUsers();
-    this.getAllGroups();
+    this.getMyGroups();
 
     //SignalR
     this.signalRService.startConnection();
@@ -60,30 +65,57 @@ export class MessageComponent implements OnInit {
   }
 
   selectUser(user: any): void {
-    this.selectedUser = user;
+    this.isUserSelected=true;
+    this.selectedUserOrGroup = user;
   }
 
+  selectGroup(group : Group){
+    this.isUserSelected=false;
+    this.selectedUserOrGroup=group;
+  }
+
+
   getConversationWithUserr(user: any): any[] {
-    return [
-      ...this.messages.filter((msg: any) => msg.toUserId === user.id || msg.fromUserId === user.id ),
-      ...this.messagesReceived.filter((msg: any) => msg.fromUserId === user.id)
-    ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    if(this.isUserSelected==true){
+      console.log("Users")
+      return [
+        ...this.messages.filter((msg: any) => msg.toUserId === user.id || msg.fromUserId === user.id )
+      ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    }else{
+      console.log("Group :")
+      return [
+        ...this.messages.filter((msg: any) => msg.toGroupId === user.id)
+      ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    }
   }
 
   getConversationWithUser(user: any): any[] {
     if (!this.messages) return [];
-    return [
-      ...this.messages.filter((msg: any) => 
-        (msg.toUserId === user.id && msg.fromUserId === this.Me.id) || 
-        (msg.fromUserId === user.id && msg.toUserId === this.Me.id)
-      )
-    ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    if(this.isUserSelected==true){
+      return [
+        ...this.messages.filter((msg: any) => 
+          (msg.toUserId === user.id && msg.fromUserId === this.Me.id) || 
+          (msg.fromUserId === user.id && msg.toUserId === this.Me.id)
+        )
+      ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    }else{
+      return [
+        ...this.messages.filter((msg: any) => 
+          (msg.toGroupId === user.id) 
+        )
+      ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
+    }
   }
   
 
   sendMessage(): void {
-    if (this.newMessage.trim() && this.selectedUser) {
-      const messageToAddDB={message : this.newMessage.trim(), fromUserId : this.Me.id , toUserId : this.selectedUser.id}
+    if (this.newMessage.trim() && this.selectedUserOrGroup) {
+      let messageToAddDB !:any
+      if(this.isUserSelected){
+        messageToAddDB={message : this.newMessage.trim(), fromUserId : this.Me.id , toUserId : this.selectedUserOrGroup.id, isForGroup : false, toGroupId : null}
+      }else{
+        messageToAddDB={message : this.newMessage.trim(), fromUserId : this.Me.id , toUserId : null, isForGroup : true, toGroupId : this.selectedUserOrGroup.id}
+      }
       this.messageService.addMessage(messageToAddDB)
       .then(data=>{
         console.log("Adding user :", data);
@@ -129,10 +161,10 @@ export class MessageComponent implements OnInit {
   }
 
   getFirstSelectedUser(): void {
-    if (!this.selectedUser) {
+    if (!this.selectedUserOrGroup) {
       for (const user of this.users) {
         if (user.id !== this.Me.id) {
-          this.selectedUser = user;
+          this.selectedUserOrGroup = user;
           break; 
         }
       }
@@ -164,9 +196,18 @@ export class MessageComponent implements OnInit {
     })
   }
 
+  getMyGroups(){
+    this.groupService.getGroupsByUserId(this.Me.id)
+    .then(groups=>{
+      this.groups=groups;
+    })
+    .catch(err=>{
+      console.log(err.message);
+    })
+  }
+
   createGroup(){
     if(this.groupName && this.groupName.length >= 2){
-      console.log(" creating group");
       
       const group ={
         name : this.groupName,
@@ -188,4 +229,25 @@ export class MessageComponent implements OnInit {
   openDialogWithRef(ref: TemplateRef<any>) {
     const dialogRef = this.dialog.open(ref);
   }
+
+  getUserById(userId :number) : any{
+    for (const user of this.users) {
+      if (user.id == userId) {
+        return user; 
+      }
+    }
+    
+    return {"username" : "Unknowm"}
+  }
+
+  addUserInGroup(){
+    this.groupService.addUserInGroup(this.selectedUserOrGroup.id, this.userToAddInGroupId)
+    .then(data=>{
+      
+    })
+    .catch(err=>{
+      console.log(err.message)
+    })
+  }
+
 }
