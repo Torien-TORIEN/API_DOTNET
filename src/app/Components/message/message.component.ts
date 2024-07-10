@@ -153,8 +153,7 @@ export class MessageComponent implements OnInit {
 
   loadMessages(): void {
     this.messageService.getAllMessages().then((messages : Message[])=>{
-        this.messages = messages
-        console.log("messages : ", this.messages)
+        this.messages = messages;
     })
     .catch(error=>{
       console.log(error);
@@ -175,7 +174,6 @@ export class MessageComponent implements OnInit {
     .then(users=>{
       this.users=users;
       this.getFirstSelectedUser();
-      console.log("Users :", users)
     })
     .catch(error =>{
       console.log("Messages Component :",error)
@@ -232,6 +230,9 @@ export class MessageComponent implements OnInit {
   }
 
   getMyGroups(){
+    if(! this.Me){
+      return ;
+    }
     this.groupService.getGroupsByUserId(this.Me.id)
     .then(groups=>{
       this.groups=groups;
