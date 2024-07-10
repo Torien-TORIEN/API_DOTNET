@@ -5,7 +5,7 @@ export interface Message {
     id: number;
     message: string;
     email : string;
-    sentAt : Date;
+    sendAt : Date;
     fromUserId: number;
     fromUser? : User;
     toUserId :number;

@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
-
+import {MatListModule} from '@angular/material/list';
 
 import { MessageService } from '../../Services/message.service';
 import { UserService } from '../../Services/user.service';
@@ -16,11 +16,12 @@ import { User } from '../../Models/user.model';
 import { SignalRService } from '../../Services/signalR.service';
 import { GroupService } from '../../Services/group.service';
 import { Group } from '../../Models/group.model';
+import { Message } from '../../Models/message.model';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [FormsModule,MatIconModule,MatDialogModule,MatFormFieldModule,MatInputModule, MatButtonModule,MatMenuModule, MatSelectModule],
+  imports: [FormsModule,MatIconModule,MatDialogModule,MatFormFieldModule,MatInputModule, MatButtonModule,MatMenuModule, MatSelectModule,MatListModule],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
@@ -28,12 +29,15 @@ export class MessageComponent implements OnInit {
 
   Me !:User;
   messagesConversation:any;
-  users: any;
+  users !: User[];
+  usersInGroup !: User[];
+  usersNotInGroup !: User[];
   selectedUserOrGroup: any;
-  isUserSelected =true;
+  isUserSelected =true; // true if selectedUserOrGroup is User or false if selectedUserOrGroup is Group
   newMessage: string = '';
-  messages : any;
+  messages !: Message[];
   groups !: Group[];
+  selectedMessageId !: number; //Message id selected to delete or edit
 
 
   groupName !: string;
@@ -52,7 +56,7 @@ export class MessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    
+    //this.loadMessages();
     this.loadMessages();
     this.getAllUsers();
     this.getMyGroups();
@@ -60,7 +64,8 @@ export class MessageComponent implements OnInit {
     //SignalR
     this.signalRService.startConnection();
     this.signalRService.messageReceived$.subscribe((data: { user: string, message: string }) => {
-      this.loadMessages(); // Recharger les messages quand un nouveau message est reçu
+      this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
+      this.getMyGroups();
     });
   }
 
@@ -72,6 +77,7 @@ export class MessageComponent implements OnInit {
   selectGroup(group : Group){
     this.isUserSelected=false;
     this.selectedUserOrGroup=group;
+    this.getUsersByGroup(this.selectedUserOrGroup.id);
   }
 
 
@@ -129,8 +135,24 @@ export class MessageComponent implements OnInit {
     }
   }
 
+  deleteMessage(){
+    this.messageService.deleteMessage(this.selectedMessageId)
+    .then(data=>{
+      console.log("deleting a message ");
+      this.signalRService.sendMessage(this.Me.username, "Deleting My message");
+      
+    })
+    .catch(error=>{
+      console.log(error);
+    })
+  }
+
+  selectMessage(id :number){
+    this.selectedMessageId=id;
+  }
+
   loadMessages(): void {
-    this.messageService.getAllMessages().then((messages)=>{
+    this.messageService.getAllMessages().then((messages : Message[])=>{
         this.messages = messages
         console.log("messages : ", this.messages)
     })
@@ -163,7 +185,7 @@ export class MessageComponent implements OnInit {
   getFirstSelectedUser(): void {
     if (!this.selectedUserOrGroup) {
       for (const user of this.users) {
-        if (user.id !== this.Me.id) {
+        if ( this.Me && user.id !== this.Me.id) {
           this.selectedUserOrGroup = user;
           break; 
         }
@@ -184,6 +206,19 @@ export class MessageComponent implements OnInit {
     const minutes = date.getMinutes().toString().padStart(2, '0');
   
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+
+  formatDateWithoutTime(date: any): string {
+    // Vérifiez si 'date' est déjà une instance de Date, sinon, convertissez-la.
+    if (!(date instanceof Date)) {
+      date = new Date(date);
+    }
+  
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois sont indexés à partir de 0
+    const year = date.getFullYear().toString();
+  
+    return `${day}/${month}/${year}`;
   }
 
   getAllGroups(){
@@ -218,7 +253,7 @@ export class MessageComponent implements OnInit {
       
       this.groupService.addGroup(group).
       then(data=>{
-        this.getAllGroups();
+        this.getMyGroups();
       })
       .catch(err=>{
         console.log(err.message);
@@ -243,11 +278,67 @@ export class MessageComponent implements OnInit {
   addUserInGroup(){
     this.groupService.addUserInGroup(this.selectedUserOrGroup.id, this.userToAddInGroupId)
     .then(data=>{
-      
+      console.log("Adding user in group : ", data)
+      this.userToAddInGroupId=0;
+      if(!this.isUserSelected) this.getUsersByGroup(this.selectedUserOrGroup.id);
+      this.signalRService.sendMessage(this.Me.username, "Add user in a  group");
     })
     .catch(err=>{
       console.log(err.message)
     })
+  }
+
+  quitGroup(){
+    this.groupService.deleteUserFromGroup(this.selectedUserOrGroup.id, this.Me.id)
+    .then(data =>{
+      console.log("quitting group");
+      this.isUserSelected=true;
+      this.selectedUserOrGroup=undefined;
+      this.getMyGroups();
+      this.getFirstSelectedUser();
+    })
+    .catch(err=>{
+      console.log(err.message);
+    })
+  }
+
+  getMyMessages(){
+    this.messageService.getMessagesByUserId(this.Me.id)
+    .then(data=>{
+      this.messages=data;
+    })
+    .catch(error=>{
+      console.log(error.message);
+    })
+  }
+
+  deleteGroup(groupId :number){
+    this.groupService.deleteGroup(groupId)
+    .then(data=>{
+      console.log("deleting group ", groupId);
+      this.isUserSelected=true;
+      this.selectedUserOrGroup=undefined;
+      this.getFirstSelectedUser();
+      this.signalRService.sendMessage(this.Me.username, "Deleting group");
+      
+    })
+    .catch(error=>{
+      console.log(error.message);
+      
+    })
+  }
+
+  getUsersByGroup(groupId: number){
+     this.groupService.getUsersByGroupId(groupId)
+        .then((users: User[]) => {
+            this.usersInGroup = users;
+            this.usersNotInGroup = this.users.filter(user => 
+                !this.usersInGroup.some(groupUser => groupUser.id === user.id)
+            );
+        })
+        .catch(error => {
+            console.log(error.message);
+        });
   }
 
 }
