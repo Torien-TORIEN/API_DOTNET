@@ -17,6 +17,8 @@ import { SignalRService } from '../../Services/signalR.service';
 import { GroupService } from '../../Services/group.service';
 import { Group } from '../../Models/group.model';
 import { Message } from '../../Models/message.model';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-message',
@@ -38,6 +40,8 @@ export class MessageComponent implements OnInit {
   messages !: Message[];
   groups !: Group[];
   selectedMessageId !: number; //Message id selected to delete or edit
+
+  private destroy$ = new Subject<void>();
 
 
   groupName !: string;
@@ -62,11 +66,26 @@ export class MessageComponent implements OnInit {
     this.getMyGroups();
 
     //SignalR
+    // this.signalRService.startConnection();
+    // this.signalRService.messageReceived$.subscribe((data: { user: string, message: string }) => {
+    //   this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
+    //   this.getMyGroups();
+    // });
+
+    // SignalR
     this.signalRService.startConnection();
-    this.signalRService.messageReceived$.subscribe((data: { user: string, message: string }) => {
-      this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
-      this.getMyGroups();
-    });
+    this.signalRService.messageReceived$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: { user: string, message: string }) => {
+        this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
+        this.getMyGroups();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.signalRService.stopConnection();
   }
 
   selectUser(user: any): void {
@@ -304,6 +323,7 @@ export class MessageComponent implements OnInit {
   }
 
   getMyMessages(){
+    if(!this.Me) return ;
     this.messageService.getMessagesByUserId(this.Me.id)
     .then(data=>{
       this.messages=data;

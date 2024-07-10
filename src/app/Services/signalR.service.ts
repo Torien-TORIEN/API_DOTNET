@@ -34,4 +34,12 @@ export class SignalRService {
         .catch(err => console.error(err));
     }
   }
+
+  public stopConnection(): void {
+    if (this.hubConnection) {
+      this.hubConnection.stop()
+        .then(() => console.log('Connection stopped'))
+        .catch(err => console.log('Error while stopping connection: ' + err));
+    }
+  }
 }
