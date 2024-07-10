@@ -131,6 +131,10 @@ namespace api.Controllers
                 return NotFound();
             }
 
+            // Supprimer les messages associés au groupe
+            var messages = _context.Messages.Where(m => m.toGroupId == id).ToList();
+            _context.Messages.RemoveRange(messages);
+
             // Supprimer les relations dans UserGroup
             _context.Entry(group).Collection(g => g.Members).Load();
             group.Members.Clear();
