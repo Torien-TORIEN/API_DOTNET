@@ -2,12 +2,15 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  //height: 100vh;
+  height: 90vh; // Ensure the container takes the full height of the viewport
 
   .users-list {
     width: 20%;
     border-right: 1px solid #ddd;
     padding: 10px;
+    min-width: 180px;
+    max-width: 300px;
+    overflow-y: auto; // Ensure the user list can scroll if needed
 
     h2 {
       text-align: center;
@@ -34,17 +37,59 @@
 
   .messages {
     flex: 1;
-    padding: 20px;
+    //padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    overflow: hidden; // Hide overflow to keep fixed header and footer
+
+    .user-to-discuss {
+      flex: 0 0 auto; // Keep the header fixed
+    }
+
+    .content-message {
+      flex: 1 1 auto; // Allow the content to grow and take available space
+      overflow-y: auto; // Enable scrolling for the messages container
+      background-image: url("../../../assets/img/inbox-bg5.png");
+    }
+
+    .message-input {
+      flex: 0 0 auto; // Keep the footer fixed
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background-image: url("../../../assets/img/inbox-bg5.png");
+
+      input, textarea {
+        flex: 1;
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        margin-right: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+    }
 
     h2 {
       margin-bottom: 20px;
     }
 
     .message {
-      margin-bottom: 10px;
+      margin-top: 8px;
+      margin-bottom: 2px;
       padding: 10px;
       border-radius: 5px;
 
@@ -52,16 +97,19 @@
         background-color: #e1ffc7;
         align-self: flex-start;
         max-width: 500px;
+        width: 48%;
+        min-width: 200px;
+        margin-left: 5px;
       }
 
       &.received {
         background-color: #cce5ff;
         align-self: flex-end;
-        margin-left: 500px;
         margin-right: 0px !important;
-        
+        width: 48%;
+        min-width: 200px;
         max-width: 500px;
-        min-width: 300px;
+        margin-left: 48%;
       }
 
       .message-details {
@@ -83,38 +131,9 @@
         font-size: 1.1em;
       }
     }
-
-    .message-input {
-      display: flex;
-      border-top: 1px solid #ddd;
-      padding: 10px;
-
-      input {
-        flex: 1;
-        padding: 10px;
-        font-size: 1em;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-right: 10px;
-      }
-
-      button {
-        padding: 10px 20px;
-        font-size: 1em;
-        border: none;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #0056b3;
-        }
-      }
-    }
   }
 
-  .icon{
+  .icon {
     font-size: 26px;
     vertical-align: middle;
     color: blue;
@@ -122,16 +141,27 @@
   }
 }
 
-.icon-menu{
+.icon-menu {
   cursor: pointer;
 }
 
-.icon-menu:hover{
+.icon-menu:hover {
   color: blue;
 }
 
-.icon-add-group{
+.icon-add-group {
   color: blue;
   vertical-align: bottom;
   cursor: pointer;
+}
+
+.nomessage{
+  align-items: center;
+  text-align: center;
+  margin-top: 8px;
+
+  &-text{
+    background-color: #666;
+    color: white;
+  }
 }

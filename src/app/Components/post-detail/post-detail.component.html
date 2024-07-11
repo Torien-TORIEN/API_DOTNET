@@ -5,9 +5,9 @@
         <mat-card-subtitle>{{formatDate(post.createdAt)}}</mat-card-subtitle>
     </mat-card-header>
     @if(post.image){
-        <img class="image" mat-card-image [src]="post.image" alt="Photo of a Shiba Inu" width="300px">
+        <img class="image" mat-card-image [src]="post.image" alt="image-post" >
     }@else{
-        <img class="image" mat-card-image src="../../../assets/img/noimg.png" alt="Photo of a Shiba Inu" width="300px">
+        <img class="image" mat-card-image src="../../../assets/img/noimg.png" alt="image-post">
     }
     
     <mat-card-content>

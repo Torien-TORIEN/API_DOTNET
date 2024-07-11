@@ -34,12 +34,45 @@
         }
 
         &-button{
-            background-color: green;
+            background-color: #007bff;
             margin-right: 10px;
             margin-bottom: 15px;
             height: 55px;
             width: 60px !important;
+            color: white;
+        }
+
+        &-button:hover{
+            background-color: #0056b3;
         }
     }
 
+}
+
+@media only screen and (max-width: 1280px) {
+    .header{
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between; /* Centers items horizontally */
+        align-items: center; /* Centers items vertically */
+    
+        &-filter{
+            margin-left: 10px;
+        }
+    
+        &-form{
+            .form{
+                margin-right: 8px;
+                
+                &-content{
+                    width: 300px;
+                }
+    
+                &-image{
+                    width: 200px;
+                }
+            }
+        }
+    
+    }
 }

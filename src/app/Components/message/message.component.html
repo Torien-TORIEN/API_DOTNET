@@ -1,37 +1,37 @@
 <div class="message-container">
-    <div class="users-list">
-      <h2>Friends</h2>
-      <ul>
-        @for (user of users; track user) {
-          @if(user.id !== Me.id){
-            <li (click)="selectUser(user)" [class.selected]="user === selectedUserOrGroup">
-              {{ user.username }}
-            </li>
-          }
+  <div class="users-list">
+    <h2>Friends</h2>
+    <ul>
+      @for (user of users; track user) {
+        @if(user.id !== Me.id){
+          <li (click)="selectUser(user)" [class.selected]="user === selectedUserOrGroup">
+            {{ user.username }}
+          </li>
         }
-      </ul>
+      }
+    </ul>
 
-      <h2>Groups <mat-icon (click)="openDialogWithRef(dialogGroup)"class="icon-add-group">add_circle</mat-icon></h2> 
-      <ul>
-        @for (group of groups; track group) {
-            <li (click)="selectGroup(group)" [class.selected]="group === selectedUserOrGroup">
-              {{ group.name }}
-            </li>
-          
-        }
-      </ul>
-    </div>
-  
-    <div class="messages">
+    <h2>Groups <mat-icon (click)="openDialogWithRef(dialogGroup)"class="icon-add-group">add_circle</mat-icon></h2> 
+    <ul>
+      @for (group of groups; track group) {
+          <li (click)="selectGroup(group)" [class.selected]="group === selectedUserOrGroup">
+            {{ group.name }}
+          </li>
+      }
+    </ul>
+  </div>
+
+  <div class="messages">
+    <div class="user-to-discuss">
       @if(isUserSelected){
         <h2> <mat-icon class="icon">supervised_user_circle</mat-icon> {{ selectedUserOrGroup?.username }}</h2>
       }@else{
-        <h2> <mat-icon class="icon">supervised_user_circle</mat-icon> {{ selectedUserOrGroup?.name }} <button mat-button [matMenuTriggerFor]="menu"><mat-icon class="icon-menu">more_horiz</mat-icon></button></h2>
+        <h2> <mat-icon class="icon">groups</mat-icon> {{ selectedUserOrGroup?.name }} <button mat-button [matMenuTriggerFor]="menu"><mat-icon class="icon-menu">more_horiz</mat-icon></button></h2>
       }
-      
-      @if (selectedUserOrGroup) {
-        <div>
-          @for (message of getConversationWithUser(selectedUserOrGroup); track message) {
+    </div>
+    @if (selectedUserOrGroup) {
+      <div class="content-message">
+        @for (message of getConversationWithUser(selectedUserOrGroup); track message) {
             <div class="message" [class]="message.fromUserId === Me.id?'sent':'received'">
               <div class="message-details">
                 @if(message.fromUserId==Me.id){
@@ -42,9 +42,7 @@
                   }@else{
                     <span class="message-author">{{ getUserById(message.fromUserId).username }}</span>
                   }
-                  
                 }
-                
                 <span class="message-date">{{ formatDate(message.sendAt) }} 
                   @if(Me.id==message.fromUserId){
                     <mat-icon [matMenuTriggerFor]="menuMessage" (click)="selectMessage(message.id)" class="icon-menu">more_horiz</mat-icon>
@@ -53,19 +51,31 @@
               </div>
               <div class="message-text">{{ message.message }}</div>
             </div>
-          }
-        </div>
-        <div class="message-input">
-          <input [(ngModel)]="newMessage" placeholder="Type a message..." />
-          <button (click)="sendMessage()">Send</button>
-        </div>
-      }@else {
-        <div>
-          <p>Select a user to view the conversation.</p>
-        </div>
-      }
-    </div>
+        }
+        @if(getConversationWithUser(selectedUserOrGroup).length==0){
+          <div class="nomessage message-text">
+            @if(isUserSelected){
+              <span class="nomessage-text">Say hello 🤚 to <b>{{selectedUserOrGroup.username}} </b> to start conversation 😍!</span>
+            }@else{
+              <span class="nomessage-text">Say hello 🤚 to all <b>{{selectedUserOrGroup.name}} </b> members to start conversation 😍!</span>
+            }
+          </div>
+        }
+      </div>
+      <div class="message-input">
+        <!-- <input [(ngModel)]="newMessage" placeholder="Type a message..." /> -->
+        <textarea matInput placeholder="Type a message..." [(ngModel)]="newMessage"></textarea>
+        @if(newMessage.length>0){
+        <button (click)="sendMessage()">Send</button>}
+      </div>
+    }@else {
+      <div>
+        <p>Select a user to view the conversation.</p>
+      </div>
+    }
+  </div>
 </div>
+
   
 
 <!-- Group Dialog Template -->

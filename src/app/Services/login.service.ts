@@ -44,6 +44,7 @@ export class LoginService {
     private setUserLogged(user :User){
         const sessionStorage = this.document.defaultView?.sessionStorage;
         if (sessionStorage) {
+            user.password="******";
             sessionStorage.setItem(this.key,JSON.stringify(user));
         }
     }
