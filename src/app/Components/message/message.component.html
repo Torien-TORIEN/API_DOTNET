@@ -5,6 +5,7 @@
       @for (user of users; track user) {
         @if(user.id !== Me.id){
           <li (click)="selectUser(user)" [class.selected]="user === selectedUserOrGroup">
+            <mat-icon class="icon-title-members">person</mat-icon>
             {{ user.username }}
           </li>
         }
@@ -15,6 +16,7 @@
     <ul>
       @for (group of groups; track group) {
           <li (click)="selectGroup(group)" [class.selected]="group === selectedUserOrGroup">
+            <mat-icon class="icon-title-members">group</mat-icon>
             {{ group.name }}
           </li>
       }
@@ -24,7 +26,7 @@
   <div class="messages">
     <div class="user-to-discuss">
       @if(isUserSelected){
-        <h2> <mat-icon class="icon">supervised_user_circle</mat-icon> {{ selectedUserOrGroup?.username }}</h2>
+        <h2> <mat-icon class="icon">account_circle</mat-icon> {{ selectedUserOrGroup?.username }}</h2>
       }@else{
         <h2> <mat-icon class="icon">groups</mat-icon> {{ selectedUserOrGroup?.name }} <button mat-button [matMenuTriggerFor]="menu"><mat-icon class="icon-menu">more_horiz</mat-icon></button></h2>
       }
@@ -123,12 +125,12 @@
 <!-- Menu Group -->
 <mat-menu #menu="matMenu">
   @if( !isUserSelected && Me.id == selectedUserOrGroup.creatorId){
-    <button mat-menu-item (click)="openDialogWithRef(addUserGroup)">Add User</button>
-    <button mat-menu-item (click)="deleteGroup(this.selectedUserOrGroup.id)">Delete Group</button>
+    <button mat-menu-item (click)="openDialogWithRef(addUserGroup)"><mat-icon>group_add</mat-icon> Add User</button>
+    <button mat-menu-item (click)="deleteGroup(this.selectedUserOrGroup.id)"><mat-icon>delete</mat-icon> Delete Group</button>
   }@else {
-    <button mat-menu-item (click)="quitGroup()">Quit Group</button>
+    <button mat-menu-item (click)="quitGroup()"><mat-icon>directions_run</mat-icon> Quit Group</button>
   }
-  <button mat-menu-item (click)="getUsersByGroup(this.selectedUserOrGroup.id); openDialogWithRef(userList)">Members</button>
+  <button mat-menu-item (click)="getUsersByGroup(this.selectedUserOrGroup.id); openDialogWithRef(userList)"><mat-icon>diversity_3</mat-icon> Members</button>
 </mat-menu>
 
 <!-- Menu Message -->
@@ -140,7 +142,7 @@
 <ng-template #userList>
   <h2 mat-dialog-title>{{selectedUserOrGroup.name }} - {{formatDateWithoutTime(selectedUserOrGroup.createdAt)}}</h2>
   <mat-dialog-content class="dialog-content" align="center">
-    <h3>Admin</h3>
+    <h3> <mat-icon class="icon-title-members">shield_person</mat-icon> Admin</h3>
     <mat-list>
       <mat-list-item>
         @if(Me.id===selectedUserOrGroup.creatorId){
@@ -151,7 +153,7 @@
         
       </mat-list-item>
     </mat-list>
-    <h3>Members list</h3>
+    <h3><mat-icon class="icon-title-members">groups_2</mat-icon> Members list</h3>
     <mat-list>
       @for(user of usersInGroup; track user){
         <mat-list-item>
