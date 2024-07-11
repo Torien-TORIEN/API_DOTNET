@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -19,7 +19,7 @@ import { PostSignalRService } from '../../Services/post.signalR.service';
   templateUrl: './post.component.html',
   styleUrl: './post.component.scss'
 })
-export class PostComponent implements OnInit {
+export class PostComponent implements OnInit, OnDestroy {
   Me !:User;
   posts !: Post[];
   buttonLabel="Save";
@@ -48,6 +48,9 @@ export class PostComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.postSignalRService.stopConnection();
+  }
 
   getAllPosts(){
     this.postService.getAllPosts()

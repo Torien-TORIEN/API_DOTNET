@@ -34,4 +34,29 @@ export class PostSignalRService {
         .catch(err => console.error(err));
     }
   }
+
+  public addToGroup(groupName: string): void {
+    if (this.hubConnection) {
+      this.hubConnection.send('AddToGroup', groupName)
+        .then(() => console.log(`Added to group ${groupName}`))
+        .catch(err => console.error(err));
+    }
+  }
+
+  public removeFromGroup(groupName: string): void {
+    if (this.hubConnection) {
+      this.hubConnection.send('RemoveFromGroup', groupName)
+        .then(() => console.log(`Removed from group ${groupName}`))
+        .catch(err => console.error(err));
+    }
+  }
+
+  public stopConnection(): void {
+    if (this.hubConnection) {
+      this.hubConnection.stop()
+        .then(() => console.log('Connection stopped'))
+        .catch(err => console.log('Error while stopping connection: ' + err));
+    }
+  }
+
 }

@@ -42,6 +42,7 @@ export class MessageComponent implements OnInit {
   selectedMessageId !: number; //Message id selected to delete or edit
 
   private destroy$ = new Subject<void>();
+  groupsAddedInHub : Group[]=[];
 
 
   groupName !: string;
@@ -60,11 +61,6 @@ export class MessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.loadMessages();
-    this.loadMessages();
-    this.getAllUsers();
-    this.getMyGroups();
-
     //SignalR
     // this.signalRService.startConnection();
     // this.signalRService.messageReceived$.subscribe((data: { user: string, message: string }) => {
@@ -75,14 +71,24 @@ export class MessageComponent implements OnInit {
     // SignalR
     this.signalRService.startConnection();
     this.signalRService.messageReceived$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))//takeUntil(this.destroy$) signifie que l'abonnement à messageReceived$ continuera seulement jusqu'à ce que destroy$ émette une valeur (par exemple, lors de la destruction du composant). Cela permet de nettoyer automatiquement la souscription lorsque le composant est détruit.
       .subscribe((data: { user: string, message: string }) => {
         this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
         this.getMyGroups();
       });
+
+      //this.loadMessages();
+    this.loadMessages();
+    this.getAllUsers();
+    this.getMyGroups();
   }
 
   ngOnDestroy(): void {
+    /*
+    Dans ngOnDestroy, this.destroy$.next(); et this.destroy$.complete();
+    sont utilisés pour notifier à tous les observables que le composant est en train d'être détruit.
+    Cela entraîne la désinscription automatique de toutes les souscriptions gérées via takeUntil(this.destroy$).
+    */
     this.destroy$.next();
     this.destroy$.complete();
     this.signalRService.stopConnection();
@@ -138,18 +144,28 @@ export class MessageComponent implements OnInit {
       let messageToAddDB !:any
       if(this.isUserSelected){
         messageToAddDB={message : this.newMessage.trim(), fromUserId : this.Me.id , toUserId : this.selectedUserOrGroup.id, isForGroup : false, toGroupId : null}
+        this.messageService.addMessage(messageToAddDB)
+        .then(data=>{
+          console.log("Adding user :", data);
+          this.signalRService.sendMessage(this.Me.username, this.newMessage.trim()); // Envoyer le message via SignalR
+          this.newMessage = '';
+        })
+        .catch(error =>{
+          console.log(error)
+        })
       }else{
         messageToAddDB={message : this.newMessage.trim(), fromUserId : this.Me.id , toUserId : null, isForGroup : true, toGroupId : this.selectedUserOrGroup.id}
+        this.messageService.addMessage(messageToAddDB)
+        .then(data=>{
+          console.log("Adding user :", data);
+          this.signalRService.sendMessageToGroup(this.selectedUserOrGroup.name,this.Me.username, this.newMessage.trim()); // Envoyer le message via SignalR à tous les utilisateurs de groupe
+          this.newMessage = '';
+        })
+        .catch(error =>{
+          console.log(error)
+        })
       }
-      this.messageService.addMessage(messageToAddDB)
-      .then(data=>{
-        console.log("Adding user :", data);
-        this.signalRService.sendMessage(this.Me.username, this.newMessage.trim()); // Envoyer le message via SignalR
-        this.newMessage = '';
-      })
-      .catch(error =>{
-        console.log(error)
-      })
+      
       
     }
   }
@@ -255,6 +271,8 @@ export class MessageComponent implements OnInit {
     this.groupService.getGroupsByUserId(this.Me.id)
     .then(groups=>{
       this.groups=groups;
+      console.log("Get My  groupes:", this.groups);
+      this.addInGroupHubs(this.groups);
     })
     .catch(err=>{
       console.log(err.message);
@@ -362,4 +380,13 @@ export class MessageComponent implements OnInit {
         });
   }
 
+  addInGroupHubs(groups : Group[]){
+    const groupstoAdd = groups.filter(group=> !this.groupsAddedInHub.some(groupAdded => groupAdded.id === group.id ) )
+    console.log("groups déjà ajouté :", this.groupsAddedInHub , "Group à ajouter :", groupstoAdd)
+    for(let group of groupstoAdd){
+      this.signalRService.addToGroup(group.name);
+      this.groupsAddedInHub.push(group);
+    }
+    
+  }
 }
