@@ -66,7 +66,9 @@
         <!-- <input [(ngModel)]="newMessage" placeholder="Type a message..." /> -->
         <textarea matInput placeholder="Type a message..." [(ngModel)]="newMessage"></textarea>
         @if(newMessage.length>0){
-        <button (click)="sendMessage()">Send</button>}
+          <!-- <button (click)="sendMessage()">Send</button> -->
+          <button (click)="sendMessage()"><mat-icon>send</mat-icon></button>
+        }
       </div>
     }@else {
       <div>
