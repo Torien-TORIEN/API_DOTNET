@@ -29,5 +29,19 @@ namespace api.Hubs
         {
             await Clients.All.SendAsync("receivedPost", user, message);
         }
+
+        // Méthode pour ajouter un client à un groupe
+        public async Task AddToGroup(string groupName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            //await Clients.Group(groupName).SendAsync("receivedPost", "Admin", $"{Context.ConnectionId} a rejoint le groupe {groupName}.");
+        }
+
+        // Méthode pour retirer un client d'un groupe
+        public async Task RemoveFromGroup(string groupName)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+            //await Clients.Group(groupName).SendAsync("receivedPost", "Admin", $"{Context.ConnectionId} a quitté le groupe {groupName}.");
+        }
     }
 }

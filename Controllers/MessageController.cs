@@ -83,8 +83,8 @@ namespace api.Controllers
 
             //[SignalR]
             // Envoie le nouveau message à tous les clients via SignalR
-            var hubContext = HttpContext.RequestServices.GetService<IHubContext<MessageHub>>();
-            hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", $"New message: {newMessage.message}");
+            /*var hubContext = HttpContext.RequestServices.GetService<IHubContext<MessageHub>>();
+            hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", $"New message: {newMessage.message}");*/
 
             return CreatedAtAction(nameof(GetById), new { id = newMessage.Id }, newMessage);
         }
