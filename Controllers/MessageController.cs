@@ -6,6 +6,8 @@ using api.Data;
 using api.Dtos;
 using api.Hubs;
 using api.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -14,23 +16,28 @@ namespace api.Controllers
 {
     [Route("api/messages")]
     [ApiController]
-    public class MessageController : ControllerBase
+    public class MessageEndpointsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly IMapper _mapper;
 
-        public MessageController(ApplicationDBContext context)
+        public MessageEndpointsController(ApplicationDBContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll()
         {
             var messages = _context.Messages.ToList();
-            return Ok(messages);
+            var response = _mapper.Map<List<MessageResponseDto>>(messages);
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetById([FromRoute] int id)
         {
             var message = _context.Messages.Find(id);
@@ -39,10 +46,12 @@ namespace api.Controllers
             {
                 return NotFound();
             }
-            return Ok(message);
+            var response = _mapper.Map<MessageResponseDto>(message);
+            return Ok(response);
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Update([FromRoute] int id, [FromBody] MessageAddDto updateMessageDto)
         {
             var existingMessage = _context.Messages.Find(id);
@@ -64,6 +73,7 @@ namespace api.Controllers
         }
 
         [HttpPost("add")]
+        [Authorize]
         public IActionResult Add([FromBody] MessageAddDto newMessageDto)
         {
             var newMessage = new Message
@@ -90,6 +100,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete([FromRoute] int id)
         {
             var message = _context.Messages.Find(id);
@@ -104,6 +115,7 @@ namespace api.Controllers
         }
 
         [HttpGet("fromUser/{userId}")]
+        [Authorize]
         public IActionResult GetMessagesFromUserById([FromRoute] int userId)
         {
             var messages = _context.Messages
@@ -111,10 +123,12 @@ namespace api.Controllers
                                     .Include(m => m.fromUser)
                                     .Include(m => m.toUser)
                                     .ToList();
-            return Ok(messages);
+            var response = _mapper.Map<List<MessageResponseDto>>(messages);
+            return Ok(response);
         }
 
         [HttpGet("toUser/{userId}")]
+        [Authorize]
         public IActionResult GetMessagesSentToUserById([FromRoute] int userId)
         {
             var messages = _context.Messages
@@ -122,11 +136,13 @@ namespace api.Controllers
                                     .Include(m => m.fromUser)
                                     .Include(m => m.toUser)
                                     .ToList();
-            return Ok(messages);
+            var response = _mapper.Map<List<MessageResponseDto>>(messages);
+            return Ok(response);
         }
 
         // Autres méthodes existantes du contrôleur
         [HttpGet("user/{userId}")]
+        [Authorize]
         public IActionResult GetMessagesForUser(int userId)
         {
             // Récupérer les messages envoyés par l'utilisateur
@@ -159,7 +175,9 @@ namespace api.Controllers
             // Fusionner les listes de messages distincts
             var userMessages = sentMessages.Union(receivedMessages).Union(groupMessages).ToList();
 
-            return Ok(userMessages);
+            var response = _mapper.Map<List<MessageResponseDto>>(userMessages);
+
+            return Ok(response);
         }
     }
 }

@@ -1,4 +1,5 @@
 using api.Data;
+using api.Services; // Ajoutez cette ligne pour inclure le namespace de TokenService
 using Microsoft.EntityFrameworkCore;
 
 //[SignalR]
@@ -8,7 +9,19 @@ using Microsoft.Extensions.Hosting;
 using api.Hubs;
 using System.Text.Json.Serialization;
 
+//Token
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+using api.Models;
+using api.Mappers;
+
 var builder = WebApplication.CreateBuilder(args);
+
+//Ajout de mappeur
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 // Ajout des services dans le conteneur DI
 // Add services to the container.
@@ -36,11 +49,30 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
         builder => builder
-            .WithOrigins("http://localhost:4200")
+            .WithOrigins("http://localhost:4300")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
 });
+
+// Configurer l'authentification JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+// Enregistrement du TokenService pour l'injection de dépendance
+builder.Services.AddScoped<TokenService>(); // Ajoutez cette ligne pour enregistrer TokenService
 
 var app = builder.Build();
 
@@ -63,6 +95,9 @@ app.UseRouting();
 
 // Ajout du middleware CORS
 app.UseCors("AllowAngularApp");
+
+// Ajouter le middleware d'authentification
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Mapping des endpoints pour les contrôleurs

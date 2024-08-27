@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using api.Data;
 using api.Dtos;
 using api.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,57 +14,70 @@ namespace api.Controllers
 {
     [Route("api/groups")]
     [ApiController]
-    public class GroupController : ControllerBase
+    public class GroupEndpointsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly IMapper _mapper;//Mapper Dto et Model
 
-        public GroupController(ApplicationDBContext context)
+        public GroupEndpointsController(ApplicationDBContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll()
         {
             var groups = _context.Groups
                 .Include(g => g.Members) // Inclure les utilisateurs associés
+                .ThenInclude(p=>p.profile)
                 .ToList();
-            return Ok(groups);
+            var response = _mapper.Map<List<GroupResponseDto>>(groups);
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetById(int id)
         {
             var group = _context.Groups
                 .Include(g => g.Members) // Inclure les utilisateurs associés
+                .ThenInclude(p=>p.profile)
                 .FirstOrDefault(g => g.Id == id);
 
             if (group == null)
             {
                 return NotFound();
             }
-
-            return Ok(group);
+            var response = _mapper.Map<GroupResponseDto>(group);
+            return Ok(response);
         }
 
         // Récupérer tous les groupes auxquels un utilisateur appartient
         [HttpGet("user/{userId}/groups")]
+        [Authorize]
         public IActionResult GetGroupsByUser(int userId)
         {
             var userGroups = _context.Groups
                 .FromSqlRaw("SELECT g.* FROM Groups g INNER JOIN UserGroup ug ON g.Id = ug.GroupId WHERE ug.UserId = {0}", userId)
+                .Include(g => g.creator)
                 .ToList();
+            
+            var response = _mapper.Map<List<GroupSimpleResponseDto>>(userGroups);
 
-            return Ok(userGroups);
+            return Ok(response);
         }
 
 
         // Récupérer tous les utilisateurs d'un groupe
         [HttpGet("{groupId}/users")]
+        [Authorize]
         public IActionResult GetUsersByGroup(int groupId)
         {
             var group = _context.Groups
                 .Include(g => g.Members) // Inclure les utilisateurs associés
+                .ThenInclude(p=>p.profile)
                 .FirstOrDefault(g => g.Id == groupId);
 
             if (group == null)
@@ -71,11 +86,13 @@ namespace api.Controllers
             }
 
             var users = group.Members;
-            return Ok(users);
+            var response = _mapper.Map<List<UserSimpleResponseDto>>(users);
+            return Ok(response);
         }
 
 
         [HttpPost("add")]
+        [Authorize]
         public IActionResult Create([FromBody] GroupAddDto newGroupDto)
         {
             if (newGroupDto == null)
@@ -101,6 +118,7 @@ namespace api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Update(int id, [FromBody] GroupUpdateDto updatedGroupDto)
         {
             if (updatedGroupDto == null)
@@ -123,6 +141,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var group = _context.Groups.Include(g => g.Members).FirstOrDefault(g => g.Id == id);
@@ -146,6 +165,7 @@ namespace api.Controllers
 
 
         [HttpPost("{groupId}/users/{userId}")]
+        [Authorize]
         public IActionResult AddUserToGroup(int groupId, int userId)
         {
             var group = _context.Groups.Include(g => g.Members).FirstOrDefault(g => g.Id == groupId);
@@ -163,6 +183,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{groupId}/users/{userId}")]
+        [Authorize]
         public IActionResult RemoveUserFromGroup(int groupId, int userId)
         {
             var group = _context.Groups.Include(g => g.Members).FirstOrDefault(g => g.Id == groupId);

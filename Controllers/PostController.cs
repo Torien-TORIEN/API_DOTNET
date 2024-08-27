@@ -6,6 +6,8 @@ using api.Data;
 using api.Dtos;
 using api.Hubs;
 using api.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -14,24 +16,31 @@ namespace api.Controllers
 {
     [Route("api/posts")]
     [ApiController]
-    public class PostController : ControllerBase
+    public class PostEndpointsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly IMapper _mapper;//Mapper Dto et Model
         
-        public PostController(ApplicationDBContext context)
+        public PostEndpointsController(ApplicationDBContext context, IMapper mapper)
         {
             _context=context;
+            _mapper = mapper;
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult GetAll(){
-            var users = _context.Posts
+            var posts = _context.Posts
             .Include(p => p.owner)
             .ToList();
-            return Ok(users);
+
+            var response = _mapper.Map<List<PostResponseDto>>(posts);
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public IActionResult GetById([FromRoute] int id){
             var post = _context.Posts
                                .Include(p => p.owner) // Inclure les données de l'utilisateur propriétaire
@@ -40,11 +49,13 @@ namespace api.Controllers
             if(post==null){
                 return NotFound();
             }
-            return Ok(post);
+            var response = _mapper.Map<PostResponseDto>(post);
+            return Ok(response);
             
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Update([FromRoute] int id, [FromBody] PostUpdateDto updatePostDto)
         {
             var existingPost = _context.Posts.Find(id);
@@ -64,6 +75,7 @@ namespace api.Controllers
         }
 
         [HttpPost("add")]
+        [Authorize]
         public IActionResult Add([FromBody] PostAddDto newPostDto)
         {
             var newPost = new Post
@@ -83,6 +95,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete([FromRoute] int id)
         {
             var post = _context.Posts.Find(id);
@@ -103,17 +116,22 @@ namespace api.Controllers
         }
 
         [HttpGet("user/{userId}")]
+        [Authorize]
         public IActionResult GetMessagesFromUserById([FromRoute] int userId)
         {
             var posts = _context.Posts
                                     .Where(m => m.userId == userId)
                                     .Include(m => m.owner)
                                     .ToList();
-            return Ok(posts);
+
+            var response = _mapper.Map<List<PostResponseDto>>(posts);
+
+            return Ok(response);
         }
 
          // Méthode pour liker un post
         [HttpPost("{id}/like")]
+        [Authorize]
         public IActionResult Like([FromRoute] int id)
         {
             var post = _context.Posts.Find(id);
@@ -130,11 +148,13 @@ namespace api.Controllers
             var hubContext = HttpContext.RequestServices.GetService<IHubContext<PostHub>>();
             hubContext.Clients.All.SendAsync("receivedPost", "Admin", $"Like a post {id}");
 
-            return Ok(post);
+            var response = _mapper.Map<PostResponseDto>(post);
+            return Ok(response);
         }
 
         // Méthode pour disliker un post
         [HttpPost("{id}/dislike")]
+        [Authorize]
         public IActionResult Dislike([FromRoute] int id)
         {
             var post = _context.Posts.Find(id);
@@ -152,7 +172,8 @@ namespace api.Controllers
             var hubContext = HttpContext.RequestServices.GetService<IHubContext<PostHub>>();
             hubContext.Clients.All.SendAsync("receivedPost", "Admin", $"Dislike a post {id}");
 
-            return Ok(post);
+            var response = _mapper.Map<PostResponseDto>(post);
+            return Ok(response);
         }
     
     }
