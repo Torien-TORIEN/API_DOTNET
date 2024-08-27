@@ -1,0 +1,61 @@
+<div class="header">
+    <h1 class="header-title"> Profile Detail</h1>
+    <button type="submit" mat-button class="header-form-button" [disabled]="!form.valid" (click)="updateProfile()"> Save</button>
+</div>
+
+<mat-tab-group>
+    <mat-tab label="Label">
+        <form class="header-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field class="form">
+                <mat-label>Label</mat-label>
+                <input matInput  placeholder="Ex. Admin" formControlName="label">
+                @if (form.get('label')?.hasError("required")) {
+                    <mat-error>Profile label is required</mat-error>
+                  }
+            </mat-form-field>
+        </form>
+    </mat-tab>
+
+    <mat-tab label="Menus">
+        <button type="button" mat-button class="menus-form-button" [disabled]="!form.valid" (click)="addMenus()"> Add Menu</button>
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource" matSort>
+          
+              <!-- ID Column -->
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                <td mat-cell *matCellDef="let row"> {{row.id}} </td>
+              </ng-container>
+          
+              <!-- Label Column -->
+              <ng-container matColumnDef="label">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Label </th>
+                <td mat-cell *matCellDef="let row"> {{row.label}} </td>
+              </ng-container>
+        
+              <!-- Path Column -->
+              <ng-container matColumnDef="path">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Path </th>
+                <td mat-cell *matCellDef="let row"> {{row.path}} </td>
+              </ng-container>
+        
+              <!-- ReadOnly Column -->
+              <ng-container matColumnDef="readOnly">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> ReadOnly </th>
+                <td mat-cell *matCellDef="let row"> {{row.isReadOnly}} </td>
+              </ng-container>
+        
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Actions </th>
+                <td mat-cell *matCellDef="let row"> 
+                    <mat-icon class="icon icon-delete" (click)="removeMenuFromProfile(row.id)">cancel</mat-icon>
+                </td>
+              </ng-container>
+          
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+    </mat-tab>
+</mat-tab-group>

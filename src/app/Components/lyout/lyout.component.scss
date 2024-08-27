@@ -81,3 +81,29 @@
       }
     }
   }
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px; /* Vous pouvez ajuster la largeur ici */
+  }
+  
+  .mat-form-field {
+    width: 100%;
+    margin-bottom: 16px; /* Espace entre les champs */
+  }
+  
+  .dialog-label {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 16px;
+  }
+  

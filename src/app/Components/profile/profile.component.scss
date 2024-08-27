@@ -1,0 +1,55 @@
+table {
+    width: 100%;
+  }
+  
+  
+  td, th {
+    //width: 25%;
+  }
+
+.header{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between; /* Centers items horizontally */
+    align-items: center; /* Centers items vertically */
+
+    &-filter{
+        margin-left: 20px;
+    }
+
+    &-form{
+        .form{
+            margin-right: 10px;
+        }
+
+        &-button{
+            background-color: #007bff;
+            margin-right: 10px;
+            margin-bottom: 15px;
+            height: 55px;
+            width: 60px !important;
+            color:white;
+        }
+        &-button:hover{
+            background-color: #0056b3;
+        }
+    }
+
+}
+
+.icon{
+    margin-right: 5px;
+}
+
+.icon-edit:hover{
+    color:blue;
+    cursor: pointer;
+}
+
+.icon-delete{
+    color:red
+}
+.icon-delete:hover{
+    color:#15acc7;
+    cursor: pointer;
+}

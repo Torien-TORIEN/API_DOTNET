@@ -5,7 +5,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 
 import { PostDetailComponent } from '../post-detail/post-detail.component';
-import { LoginService } from '../../Services/login.service';
+import { AuthService } from '../../Services/auth.service';
 import { User } from '../../Models/user.model';
 import { PostService } from '../../Services/post.service';
 import { Post } from '../../Models/post.model';
@@ -32,13 +32,15 @@ export class PostComponent implements OnInit, OnDestroy {
   });
 
   constructor(
-    private loginService : LoginService,
+    private authService : AuthService,
     private postService : PostService,
     private postSignalRService : PostSignalRService
   ){}
 
   ngOnInit():void{
-    this.Me =this.loginService.getUserLogged();
+    const user =this.authService.getUserLogged();
+    if(user)
+    this.Me =user;
     this.getAllPosts();
 
     //SignalR

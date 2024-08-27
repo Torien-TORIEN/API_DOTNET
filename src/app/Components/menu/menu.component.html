@@ -1,0 +1,89 @@
+<div class="header">
+    <div class="header-filter">
+        <mat-form-field class="filter">
+            <mat-label>Filter</mat-label>
+            <input matInput  placeholder="Ex. Max" #input (input)="applyFilter($event)">
+        </mat-form-field>
+    </div>
+    @if(selectMode){
+        <button type="button" mat-button class="header-form-button" (click)="validateSelection()">Validate</button>
+    }@else{
+        <form class="header-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field class="form">
+                <mat-label>Label</mat-label>
+                <input matInput  placeholder="Ex. Admin" formControlName="label">
+                @if (form.get('label')?.hasError("required")) {
+                    <mat-error>Menu Label is required</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="form">
+                <mat-label>Path</mat-label>
+                <input matInput  placeholder="/lyout/inbox" formControlName="path">
+                @if (form.get('path')?.hasError("required")) {
+                    <mat-error>Path is required</mat-error>
+                }
+                @if (form.get('path')?.hasError("path")) {
+                    <mat-error>Path is not valid</mat-error>
+                }
+            </mat-form-field>
+
+            
+            <mat-checkbox class="form-check-box" formControlName="isReadOnly">Is ReadOnly</mat-checkbox>
+
+            <button type="submit" mat-button class="header-form-button" [disabled]="!form.valid"> Save</button>
+        </form>
+    }
+</div>
+
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+  
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+        <td mat-cell *matCellDef="let row"> {{row.id}} </td>
+      </ng-container>
+  
+      <!-- Label Column -->
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Label </th>
+        <td mat-cell *matCellDef="let row"> {{row.label}} </td>
+      </ng-container>
+
+      <!-- Path Column -->
+      <ng-container matColumnDef="path">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Path </th>
+        <td mat-cell *matCellDef="let row"> {{row.path}} </td>
+      </ng-container>
+
+      <!-- ReadOnly Column -->
+      <ng-container matColumnDef="readOnly">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> ReadOnly </th>
+        <td mat-cell *matCellDef="let row"> {{row.isReadOnly}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Actions </th>
+        <td mat-cell *matCellDef="let row"> 
+            @if(selectMode) {
+                <mat-checkbox (change)="toggleMenuSelection(row)"></mat-checkbox>
+            }@else{
+                <mat-icon class="icon icon-edit" (click)="selectMenuToEdit(row.id)">edit</mat-icon>
+                <mat-icon class="icon icon-delete" (click)="deleteMenu(row.id)">delete</mat-icon>
+            }
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="5">No data matching the filter "{{input.value}}"</td>
+      </tr>
+    </table>
+  
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of menus"></mat-paginator>
+  </div>

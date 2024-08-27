@@ -5,24 +5,29 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import {MatSelectModule} from '@angular/material/select';
 
 import { User } from '../../Models/user.model';
 import { UserService } from '../../Services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ProfileService } from '../../Services/profile.service';
+import { Profile } from '../../Models/profile.model';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, MatIconModule, ReactiveFormsModule],
+  imports: [MatFormFieldModule, MatInputModule, MatMenuModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, MatIconModule, MatSelectModule, ReactiveFormsModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
 export class UserComponent implements AfterViewInit, OnInit {
-  displayedColumns: string[] = ['id', 'username', 'email', 'password', 'actions'];
+  displayedColumns: string[] = ['id', 'username', 'email', 'password', 'profileName', 'actions'];
   dataSource!: MatTableDataSource<User>;
 
   users!: User[];
+  profiles!: Profile[];
   buttonLabel = "Save";
   userEditId !: number;
 
@@ -35,10 +40,17 @@ export class UserComponent implements AfterViewInit, OnInit {
     password: new FormControl('', [Validators.required, Validators.minLength(3)]),
   });
 
-  constructor(private userService: UserService) {}
+  formUpdate: FormGroup = new FormGroup({
+    username: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    profileID: new FormControl('', [Validators.required]),
+  });
+
+  constructor(private userService: UserService, private profileService : ProfileService) {}
 
   ngOnInit(): void {
     this.getAllUsers();
+    this.getAllProfiles();
   }
 
   ngAfterViewInit() {
@@ -57,7 +69,7 @@ export class UserComponent implements AfterViewInit, OnInit {
     }
   }
 
-  getAllUsers() {
+  private getAllUsers() {
     this.userService.getAllUsers()
       .then(users => {
         this.users = users;
@@ -73,14 +85,22 @@ export class UserComponent implements AfterViewInit, OnInit {
       });
   }
 
-  onSubmit() {
-    if (this.form.valid) {
-      const {username, email, password} = this.form.value;
+  private getAllProfiles(){
+    this.profileService.getAllProfiles()
+    .then((data : Profile[])=>{
+      this.profiles = data;
+    })
+    .catch(err =>{
+      console.log(err);
+      
+    })
+  }
 
-      // Add
-      if(this.userEditId && this.userEditId!==0){
+  onSubmit() {
+      if(this.formUpdate.valid &&this.userEditId && this.userEditId!==0){
         //Edit
-        this.userService.updateUser(this.userEditId, {username, email, password})
+        const {username, email, profileID} = this.formUpdate.value;
+        this.userService.updateUser(this.userEditId, {username, email, profileID})
           .then( data =>{
             this.form.reset();
             this.userEditId=0;
@@ -89,17 +109,19 @@ export class UserComponent implements AfterViewInit, OnInit {
           .catch(error => {
             console.log(error)
           })
-      }else{
+      }else if(this.form.valid) {
+        //Add
+        const {username, email, password} = this.form.value;
         this.userService.addUser({username, email, password})
           .then(data => {
             this.form.reset();
             this.getAllUsers();
           })
           .catch(error => {
-            console.log("Component user:", error);
+            console.log(error);
           });
       }
-    }
+    
   }
 
   deleteUser(id: number) {
@@ -108,7 +130,7 @@ export class UserComponent implements AfterViewInit, OnInit {
         this.getAllUsers();
       })
       .catch(error => {
-        console.log("deleting user", error);
+        console.log(error);
       });
   }
 
@@ -117,10 +139,10 @@ export class UserComponent implements AfterViewInit, OnInit {
     const user = this.users.filter((user)=> (user.id==id))[0];
     if(user){
       this.userEditId=user.id;
-      this.form.patchValue({
+      this.formUpdate.patchValue({
         username : user.username,
         email : user.email,
-        password :user.password
+        profileID :user.profileId
       })
     }
   }

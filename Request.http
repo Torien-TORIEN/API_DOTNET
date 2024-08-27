@@ -1,0 +1,82 @@
+### Requête GET pour obtenir la liste des utilisateurs INSTALLER extension REST Client
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUb3JpZW4iLCJqdGkiOiI5ZjJhNGI1MC1lNzIwLTRmMDItOTE1ZS1mNGZhNGUzMjhjNTYiLCJleHAiOjE3MjM1NjYzNDcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTA5NiIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIwMCJ9.hLU7ZYzq31CSOYYt-UqFPucl6GA93O1gmUMOu1u039w
+### USERS
+GET http://localhost:5096/api/user
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById
+GET http://localhost:5096/api/user/2
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### GROUPS
+GET http://localhost:5096/api/groups
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById
+GET http://localhost:5096/api/groups/10
+Accept: application/json
+Authorization: Bearer {{token}}
+### GetUsersByGroup
+GET http://localhost:5096/api/groups/10/users
+Accept: application/json
+Authorization: Bearer {{token}}
+### GetGroupsByUser
+GET http://localhost:5096/api/groups/user/2/groups
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### PROFILES
+GET http://localhost:5096/api/profiles
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById 
+GET http://localhost:5096/api/profiles/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### MENUS
+GET http://localhost:5096/api/menus
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById
+GET http://localhost:5096/api/menus/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### MESSAGES
+GET http://localhost:5096/api/messages
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById
+GET http://localhost:5096/api/messages/1
+Accept: application/json
+Authorization: Bearer {{token}}
+### FromUser
+GET http://localhost:5096/api/messages/fromUser/2
+Accept: application/json
+Authorization: Bearer {{token}}
+### ToUser
+GET http://localhost:5096/api/messages/toUser/3
+Accept: application/json
+Authorization: Bearer {{token}}
+### ForUser : Sender or receiver
+GET http://localhost:5096/api/messages/user/3
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### POSTS
+GET http://localhost:5096/api/posts
+Accept: application/json
+Authorization: Bearer {{token}}
+### ById
+GET http://localhost:5096/api/posts/8
+Accept: application/json
+Authorization: Bearer {{token}}
+### PostsByUser
+GET http://localhost:5096/api/posts/user/2
+Accept: application/json
+Authorization: Bearer {{token}}

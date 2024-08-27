@@ -1,1 +1,15 @@
-<p>not-found works!</p>
+<div class="wrapper">
+    <mat-card class="card">
+      <mat-card-content class="card-container">
+        @if(errorAccessDinied){
+            <img src="assets/img/erreur-403-3.png" class="card-container-img" alt="erreur">
+            <p class="card-container-text">YOU DO NOT HAVE ACCESS TO THIS PAGE</p>
+        }@else {
+            <img src="assets/img/erreur-404.png" class="card-container-img" alt="erreur">
+            <p class="card-container-text">PAGE NOT FOUND</p>
+        }
+        <button mat-flat-button (click)="navigateToHome()" color="primary">Go to Inbox</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  

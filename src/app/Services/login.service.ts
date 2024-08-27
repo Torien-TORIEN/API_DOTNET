@@ -34,7 +34,13 @@ export class LoginService {
                 resolve(data);
             },
             error: err=>{
-                reject("Error while logging in :"+ err.message)
+                if(err.status==500){
+                    reject("Login Or Password Incorrect !");
+                }else if( err.status= 401){
+                    reject(err.error.message);
+                }else{
+                    reject("Server Error !");
+                }
             }
             })
         })

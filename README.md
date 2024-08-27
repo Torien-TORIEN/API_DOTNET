@@ -6,6 +6,24 @@
 ## Service Signalr
 
 
+## Generator d'API :
+### Installer du coté du front
+    npm install -g @openapitools/openapi-generator-cli
+
+### Installer Java sur votre poste
+    https://www.oracle.com/java/technologies/downloads/#java11
+
+    Mettre le path dans la variables d'environnement système
+    Créer une variable    JAVA_HOME = C:\Program Files\Java\jdk-22
+    et Dands le path= %JAVA_HOME%\bin
+
+
+### Mettre ce scrip dans le package.json
+    "generate:api": "openapi-generator-cli generate -g typescript-angular -i http://localhost:5096/swagger/v1/swagger.json -o ./openapi/build",
+
+    
+
+
 
 
 

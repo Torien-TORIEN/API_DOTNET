@@ -1,13 +1,16 @@
 import { Routes } from '@angular/router';
+import { MenuGuard } from './Services/menu.guard';
+import { EditGuard } from './Services/edit.guard';
+import { ROUTES_CONSTANTS } from '../assets/utils/constants/routes.constant';
 
 export const routes: Routes = [
     {
         path: '',
-        redirectTo:"/websocket/users",
+        redirectTo:"/login",
         pathMatch: 'full',
     },
     {
-        path: "websocket",
+        path: "lyout",
         loadComponent: () =>
           import('./Components/lyout/lyout.component').then(
             m => m.LyoutComponent
@@ -19,6 +22,7 @@ export const routes: Routes = [
                   import('./Components/user/user.component').then(
                     m => m.UserComponent
                   ),
+                canActivate: [MenuGuard]  // Appliquer le guard ici
             },
             {
                 path: "posts",
@@ -26,6 +30,7 @@ export const routes: Routes = [
                   import('./Components/post/post.component').then(
                     m => m.PostComponent
                   ),
+                canActivate: [MenuGuard]  // Appliquer le guard ici
             },
             {
                 path: "inbox",
@@ -33,6 +38,41 @@ export const routes: Routes = [
                   import('./Components/message/message.component').then(
                     m => m.MessageComponent
                   ),
+                canActivate: [MenuGuard]  // Appliquer le guard ici
+            },
+            {
+              path: "profiles",
+              loadComponent: () =>
+                import('./Components/profile/profile.component').then(
+                  m => m.ProfileComponent
+                ),
+              canActivate: [MenuGuard]  // Appliquer le guard ici
+            },
+            {
+              path: "profiles/:id",
+              loadComponent: () =>
+                import('./Components/profile-edition/profile-edition.component').then(
+                  m => m.ProfileEditionComponent
+                ),
+              canActivate: [EditGuard],
+              data: { requiredMenuUrl: ROUTES_CONSTANTS.PROFILES }  // Passer l'URL de base comme donnée
+            },
+            {
+              path: "menus",
+              loadComponent: () =>
+                import('./Components/menu/menu.component').then(
+                  m => m.MenuComponent
+                ),
+              canActivate: [MenuGuard]  // Appliquer le guard ici
+            },
+            {
+              path: "menus/select/:id",
+              loadComponent: () =>
+                import('./Components/menu/menu.component').then(
+                  m => m.MenuComponent
+                ),
+                canActivate: [EditGuard],
+                data: { requiredMenuUrl: ROUTES_CONSTANTS.PROFILES }  // Passer l'URL de base comme donnée
             },
           ]
     },
@@ -43,7 +83,6 @@ export const routes: Routes = [
             m => m.LoginComponent
           ),
     },
-    
 
     {
         path: '**',

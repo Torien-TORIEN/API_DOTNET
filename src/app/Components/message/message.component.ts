@@ -11,7 +11,7 @@ import {MatListModule} from '@angular/material/list';
 
 import { MessageService } from '../../Services/message.service';
 import { UserService } from '../../Services/user.service';
-import { LoginService } from '../../Services/login.service';
+import { AuthService } from '../../Services/auth.service';
 import { User } from '../../Models/user.model';
 import { SignalRService } from '../../Services/signalR.service';
 import { GroupService } from '../../Services/group.service';
@@ -52,7 +52,7 @@ export class MessageComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private userService : UserService,
-    private loginService : LoginService,
+    private authService : AuthService,
     private signalRService: SignalRService,
     private groupService : GroupService,
     private dialog: MatDialog,
@@ -61,13 +61,6 @@ export class MessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //SignalR
-    // this.signalRService.startConnection();
-    // this.signalRService.messageReceived$.subscribe((data: { user: string, message: string }) => {
-    //   this.getMyMessages(); // Recharger les messages quand un nouveau message est reçu
-    //   this.getMyGroups();
-    // });
-
     // SignalR
     this.signalRService.startConnection();
     this.signalRService.messageReceived$
@@ -108,12 +101,10 @@ export class MessageComponent implements OnInit {
 
   getConversationWithUserr(user: any): any[] {
     if(this.isUserSelected==true){
-      console.log("Users")
       return [
         ...this.messages.filter((msg: any) => msg.toUserId === user.id || msg.fromUserId === user.id )
       ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
     }else{
-      console.log("Group :")
       return [
         ...this.messages.filter((msg: any) => msg.toGroupId === user.id)
       ].sort((a, b) => new Date(a.sendAt).getTime() - new Date(b.sendAt).getTime());
@@ -196,11 +187,11 @@ export class MessageComponent implements OnInit {
   }
 
   getUserConnected(){
-    const user = this.loginService.getUserLogged();
+    const user = this.authService.getUserLogged();
     if(user){
       this.Me=user;
     }else{
-      this.loginService.logout();
+      this.authService.logout();
     }
   }
 
@@ -271,7 +262,6 @@ export class MessageComponent implements OnInit {
     this.groupService.getGroupsByUserId(this.Me.id)
     .then(groups=>{
       this.groups=groups;
-      console.log("Get My  groupes:", this.groups);
       this.addInGroupHubs(this.groups);
     })
     .catch(err=>{
@@ -287,7 +277,6 @@ export class MessageComponent implements OnInit {
         creatorId : this.Me.id,
         membersIds : [ this.Me.id]
       }
-      console.log(" group : ", group);
       
       this.groupService.addGroup(group).
       then(data=>{
@@ -316,7 +305,6 @@ export class MessageComponent implements OnInit {
   addUserInGroup(){
     this.groupService.addUserInGroup(this.selectedUserOrGroup.id, this.userToAddInGroupId)
     .then(data=>{
-      console.log("Adding user in group : ", data)
       this.userToAddInGroupId=0;
       if(!this.isUserSelected) this.getUsersByGroup(this.selectedUserOrGroup.id);
       this.signalRService.sendMessage(this.Me.username, "Add user in a  group");
@@ -329,7 +317,6 @@ export class MessageComponent implements OnInit {
   quitGroup(){
     this.groupService.deleteUserFromGroup(this.selectedUserOrGroup.id, this.Me.id)
     .then(data =>{
-      console.log("quitting group");
       this.isUserSelected=true;
       this.selectedUserOrGroup=undefined;
       this.getMyGroups();
@@ -354,7 +341,6 @@ export class MessageComponent implements OnInit {
   deleteGroup(groupId :number){
     this.groupService.deleteGroup(groupId)
     .then(data=>{
-      console.log("deleting group ", groupId);
       this.isUserSelected=true;
       this.selectedUserOrGroup=undefined;
       this.getFirstSelectedUser();
@@ -382,7 +368,7 @@ export class MessageComponent implements OnInit {
 
   addInGroupHubs(groups : Group[]){
     const groupstoAdd = groups.filter(group=> !this.groupsAddedInHub.some(groupAdded => groupAdded.id === group.id ) )
-    console.log("groups déjà ajouté :", this.groupsAddedInHub , "Group à ajouter :", groupstoAdd)
+    //console.log("groups déjà ajouté :", this.groupsAddedInHub , "Group à ajouter :", groupstoAdd)
     for(let group of groupstoAdd){
       this.signalRService.addToGroup(group.name);
       this.groupsAddedInHub.push(group);

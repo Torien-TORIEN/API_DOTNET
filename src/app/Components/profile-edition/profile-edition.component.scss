@@ -1,0 +1,74 @@
+table {
+    width: 100%;
+  }
+  
+
+  .header {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center; /* Center the title horizontally */
+    align-items: center; /* Center items vertically */
+
+    /* For centering title */
+    &-title {
+        flex-grow: 1; /* Allow title to take up available space */
+        text-align: center; /* Center the title text */
+        margin: 0;
+    }
+
+    &-form {
+        display: flex;
+        align-items: center;
+
+        .form {
+            margin-right: 10px;
+            display: flex;
+            justify-content: center; /* Center the form field */
+            width: 100%; /* Take up full width */
+        }
+
+        &-button {
+            background-color: #007bff;
+            margin-right: 10px;
+            margin-bottom: 15px;
+            height: 55px;
+            width: 60px !important;
+            color: white;
+        }
+
+        &-button:hover {
+            background-color: #0056b3;
+        }
+    }
+}
+
+.menus-form-button {
+    background-color: #007bff;
+    margin-right: 10px;
+    margin-bottom: 15px;
+    height: 55px;
+    color: white;
+    margin-left: auto; /* Push the button to the right */
+    display: block; /* Ensure it behaves like a block element */
+}
+
+.menus-form-button:hover {
+    background-color: #0056b3;
+}
+
+.icon{
+    margin-right: 5px;
+}
+
+.icon-edit:hover{
+    color:blue;
+    cursor: pointer;
+}
+
+.icon-delete{
+    color:red
+}
+.icon-delete:hover{
+    color:#15acc7;
+    cursor: pointer;
+}
